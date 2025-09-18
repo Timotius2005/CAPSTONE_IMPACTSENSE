@@ -1,0 +1,13 @@
+# Node modules
+frontend/node_modules/
+
+# Build outputs
+frontend/dist/
+frontend/build/
+
+# PHP vendor (jika pakai composer)
+backend/vendor/
+
+# System files
+.DS_Store
+Thumbs.db
