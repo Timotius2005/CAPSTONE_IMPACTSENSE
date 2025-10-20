@@ -1,0 +1,97 @@
+.registerPage {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-size: cover;
+  background-position: center;
+  font-family: "Poppins", sans-serif;
+}
+
+.overlay {
+  background-color: rgba(126, 143, 129, 0.8);
+  padding: 40px 60px;
+  border-radius: 20px;
+  text-align: center;
+  max-width: 500px;
+  width: 90%;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 20px;
+  font-family: 'Poppins';
+}
+
+/* Tab container pill */
+.tabContainer {
+  display: flex;
+  justify-content: center;
+  background-color: #fff;
+  border-radius: 50px;
+  padding: 4px;
+  margin-bottom: 25px;
+  font-family: 'Poppins';
+}
+
+.tab {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: #7e8f81;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Poppins';
+}
+
+.tab.active {
+  background-color: #e8a15a;
+  color: #fff;
+}
+
+/* Form */
+.form {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.form label {
+  font-weight: 600;
+  margin: 10px 0 5px;
+  color: #fff;
+  font-family: 'Poppins';
+}
+
+.form input {
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  font-size: 14px;
+  font-family: 'Poppins';
+}
+
+.submitBtn {
+  background-color: #e8a15a;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  font-family: 'Poppins';
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.submitBtn:hover {
+  transform: scale(1.02);
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+}
