@@ -5,6 +5,13 @@ import styles from "./LoginPage.module.css";
 function LoginPage() {
   const navigate = useNavigate();
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+  
+    navigate("/devices");
+  };
+
   return (
     <div
       className={styles.loginPage}
@@ -30,12 +37,12 @@ function LoginPage() {
         </div>
 
         {/* Form Login */}
-        <form className={styles.form}>
+        <form className={styles.form} onSubmit={handleSubmit}>
           <label>Username</label>
-          <input type="text" placeholder="Enter Username" />
+          <input type="text" placeholder="Enter Username" required />
 
           <label>Password</label>
-          <input type="password" placeholder="Enter Password" />
+          <input type="password" placeholder="Enter Password" required />
 
           <button type="submit" className={styles.submitBtn}>
             Login
