@@ -1,15 +1,22 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import styles from "./HelmetInfoPage.module.css";
 
 function HelmetInfoPage() {
+  const { deviceId } = useParams(); 
   const [helmetId, setHelmetId] = useState("");
   const [emergencyContact, setEmergencyContact] = useState("");
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (deviceId) {
+      setHelmetId(deviceId); 
+    }
+  }, [deviceId]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     navigate("/devices", {
       state: {
         newDevice: {
@@ -44,6 +51,7 @@ function HelmetInfoPage() {
             onChange={(e) => setHelmetId(e.target.value)}
             className={styles.input}
             required
+            disabled={!!deviceId} 
           />
 
           <label className={styles.label}>Nomor Kontak Darurat</label>
@@ -60,7 +68,7 @@ function HelmetInfoPage() {
           </div>
 
           <button type="submit" className={styles.submitBtn}>
-            Submit
+            {deviceId ? "Update Data" : "Submit"}
           </button>
         </form>
       </div>

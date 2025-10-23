@@ -166,4 +166,53 @@
   font-weight: 400;
 }
 
+.topRightBox {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  background-color: rgba(126, 143, 129, 0.8);
+  border-radius: 15px;
+  padding: 8px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.userIcon {
+  color: white;
+  font-size: 18px;
+}
+
+.username {
+  color: white;
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.logoutBtn {
+  background-color: #E8A15A;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  padding: 5px 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.logoutBtn:hover {
+  transform: scale(1.05);
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.editIcon {
+  margin-left: 8px;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.editIcon:hover {
+  transform: scale(1.2);
+  color: #E8A15A;
+}
 
