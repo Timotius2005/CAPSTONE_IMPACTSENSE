@@ -73,12 +73,12 @@ class UsersHelmController extends Controller
     public function updateEmergencyContact(Request $request)
     {
         $request->validate([
-            'helm_id' => 'required|integer|exists:helm_devices,helm_id',
+            'serial_number' => 'required|integer|exists:helm_devices,serial_number',
             'emergency_name' => 'nullable|string|max:100',
             'emergency_phone' => 'nullable|string|max:20',
         ]);
 
-        $helm = HelmDevice::where('helm_id', $request->helm_id)
+        $helm = HelmDevice::where('serial_number', $request->serial_number)
             ->where('user_id', $request->user()->user_id)
             ->first();
 

@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
 import styles from "./EditContactPage.module.css";
 
 function EditContactPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const [emergencyContact, setEmergencyContact] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // Ambil deviceId jika dikirim dari halaman sebelumnya
+  // Ambil deviceId dari state saat navigate
   const deviceId = location.state?.deviceId || "";
 
   useEffect(() => {
@@ -16,12 +18,46 @@ function EditContactPage() {
     }
   }, [deviceId]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Simulasi update data kontak (nanti bisa dihubungkan ke API)
-    alert(`Nomor kontak darurat untuk helm ${deviceId} berhasil diperbarui!`);
-    navigate("/devices"); // kembali ke halaman daftar helm
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        alert("Token tidak ditemukan. Silakan login kembali.");
+        return;
+      }
+
+      // Panggil endpoint updateEmergencyContact
+      const response = await axios.put(
+        "http://localhost:8000/api/user/emergency",
+        {
+          serial_number: deviceId,
+          emergency_phone: emergencyContact,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      alert("Nomor kontak darurat berhasil diperbarui!");
+      console.log("Response:", response.data);
+
+      navigate("/devices"); // kembali ke halaman daftar helm
+    } catch (error) {
+      console.error("Gagal memperbarui kontak darurat:", error);
+      if (error.response?.data?.message) {
+        alert(error.response.data.message);
+      } else {
+        alert("Terjadi kesalahan saat memperbarui data.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -45,8 +81,12 @@ function EditContactPage() {
             required
           />
 
-          <button type="submit" className={styles.submitBtn}>
-            Submit
+          <button
+            type="submit"
+            className={styles.submitBtn}
+            disabled={loading}
+          >
+            {loading ? "Menyimpan..." : "Submit"}
           </button>
         </form>
       </div>

@@ -11,10 +11,10 @@
 
 .overlay {
   background-color: rgba(126, 143, 129, 0.8);
-  padding: 35px 50px;
-  border-radius: 20px;
+  padding: 50px 70px;
+  border-radius: 25px;
   text-align: center;
-  max-width: 500px;  
+  max-width: 800px;  
   width: 90%;
 }
 
@@ -74,7 +74,7 @@
 .tableHeader {
   display: grid;
   font-family: 'Poppins';
-  grid-template-columns: 60px 1fr 1fr;
+  grid-template-columns: 80px 1.5fr 1fr 1.5fr;
   font-weight: 600;
   font-size: 14px;
   color: #fff;
@@ -89,7 +89,7 @@
 
 .tableRow {
   display: grid;
-  grid-template-columns: 60px 1fr 1fr;
+  grid-template-columns: 80px 1.5fr 1fr 1.5fr;
   align-items: center;
   padding: 10px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);

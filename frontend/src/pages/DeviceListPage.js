@@ -124,6 +124,7 @@ useEffect(() => {
             <div className={styles.tableHeader}>
               <span>No</span>
               <span>ID Helm</span>
+              <span>Kontak Darurat</span>
               <span>Status</span>
             </div>
 
@@ -137,6 +138,7 @@ useEffect(() => {
                     onClick={() => handleEdit(device.id)}
                   />
                 </span>
+                <span className={styles.contact}>{device.contact}</span>
                 <button
                   className={
                     device.status === "Connected"
