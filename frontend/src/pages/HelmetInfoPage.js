@@ -1,31 +1,52 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import styles from "./HelmetInfoPage.module.css";
 
 function HelmetInfoPage() {
-  const { deviceId } = useParams(); 
   const [helmetId, setHelmetId] = useState("");
   const [emergencyContact, setEmergencyContact] = useState("");
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (deviceId) {
-      setHelmetId(deviceId); 
-    }
-  }, [deviceId]);
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    navigate("/devices", {
-      state: {
-        newDevice: {
-          id: helmetId,
-          status: "Disconnected",
-          contact: emergencyContact,
+    const formattedPhone = emergencyContact.startsWith("0")
+      ? emergencyContact
+      : "0" + emergencyContact;
+
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/user/helm",
+        {
+          serial_number: helmetId, 
+          emergency_phone: formattedPhone, 
         },
-      },
-    });
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("Helm berhasil ditambahkan:", response.data);
+
+
+      navigate("/devices", {
+        state: {
+          newDevice: {
+            id: response.data.helm.helm_id,
+            serialNumber: helmetId,
+            contact: formattedPhone,
+            status: "Disconnected",
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Gagal mengirim data:", error);
+      alert("Terjadi kesalahan saat menyimpan data ke server.");
+    }
   };
 
   return (
@@ -51,7 +72,6 @@ function HelmetInfoPage() {
             onChange={(e) => setHelmetId(e.target.value)}
             className={styles.input}
             required
-            disabled={!!deviceId} 
           />
 
           <label className={styles.label}>Nomor Kontak Darurat</label>
@@ -68,7 +88,7 @@ function HelmetInfoPage() {
           </div>
 
           <button type="submit" className={styles.submitBtn}>
-            {deviceId ? "Update Data" : "Submit"}
+            Submit
           </button>
         </form>
       </div>

@@ -2,12 +2,62 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FiEdit2, FiUser, FiLogOut } from "react-icons/fi";
 import styles from "./DeviceListPage.module.css";
+import axios from "axios";
 
 function DeviceListPage() {
   const [devices, setDevices] = useState([]);
   const location = useLocation();
   const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+useEffect(() => {
+  const fetchUser = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
 
+      const response = await axios.get("http://localhost:8000/api/user", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setUsername(response.data.user.username); // sesuaikan field-nya kalau bukan 'name'
+    } catch (error) {
+      console.error("Gagal mengambil data user:", error);
+    }
+  };
+
+  fetchUser();
+}, []);
+
+  useEffect(() => {
+  const fetchHelmets = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get("http://localhost:8000/api/user/helm-devices", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.data?.data) {
+        const formatted = response.data.data.map((helm) => ({
+          id: helm.serial_number,
+          status: helm.pairing_status || "Disconnected",
+          contact: helm.emergency_phone || "-",
+        }));
+        setDevices(formatted);
+      }
+    } catch (error) {
+      console.error("Gagal mengambil data helm:", error);
+    }
+  };
+
+  fetchHelmets();
+}, []);
+
+
+  // 🔹 Tambah helm baru dari state (jika baru ditambahkan)
   useEffect(() => {
     if (location.state?.newDevice) {
       setDevices((prev) => {
@@ -19,14 +69,32 @@ function DeviceListPage() {
     }
   }, [location.state, navigate, location.pathname]);
 
+  // 🔹 Edit helm (ke halaman helmet-info)
   const handleEdit = (id) => {
     navigate("/helmet-info", { state: { deviceId: id } });
   };
 
-  // ✅ Revisi bagian ini
-  const handleLogout = () => {
-    alert("Logout berhasil!");
-    navigate("/login", { replace: true }); // arahkan ke halaman login
+  // 🔹 Logout
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(
+        "http://localhost:8000/api/logout",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      localStorage.removeItem("token");
+      alert("Logout berhasil!");
+      navigate("/login", { replace: true });
+    } catch (error) {
+      console.error("Gagal logout:", error);
+      alert("Gagal logout. Silakan coba lagi.");
+    }
   };
 
   return (
@@ -36,7 +104,7 @@ function DeviceListPage() {
     >
       <div className={styles.topRightBox}>
         <FiUser className={styles.userIcon} />
-        <span className={styles.username}>Username</span>
+        <span className={styles.username}>{username || "User"}</span>
         <button className={styles.logoutBtn} onClick={handleLogout}>
           <FiLogOut size={18} />
         </button>
@@ -46,9 +114,7 @@ function DeviceListPage() {
         <h1 className={styles.title}>ImpactSense Helmet</h1>
 
         <div className={styles.tabContainer}>
-          <button className={`${styles.tab} ${styles.active}`}>
-            List Helm
-          </button>
+          <button className={`${styles.tab} ${styles.active}`}>List Helm</button>
         </div>
 
         {devices.length === 0 ? (
@@ -78,7 +144,7 @@ function DeviceListPage() {
                       : styles.disconnectedBtn
                   }
                 >
-                  {device.status}
+                  {device.status || "Disconnected"}
                 </button>
               </div>
             ))}

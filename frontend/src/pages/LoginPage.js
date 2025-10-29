@@ -1,15 +1,49 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import styles from "./LoginPage.module.css";
 
 function LoginPage() {
   const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    username: "",
+    password: "",
+  });
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
-  
-    navigate("/devices");
+    try {
+      const res = await axios.post(
+        "http://127.0.0.1:8000/api/login",
+        {
+          username: formData.username,
+          password: formData.password,
+        },
+        { withCredentials: true }
+      );
+
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
+      }
+
+      alert("Login successful!");
+      navigate("/devices");
+    } catch (err) {
+      console.error(err);
+      setError(
+        err.response?.data?.message || "Login failed. Please try again."
+      );
+    }
   };
 
   return (
@@ -28,10 +62,7 @@ function LoginPage() {
           >
             Login
           </button>
-          <button
-            className={styles.tab}
-            onClick={() => navigate("/register")}
-          >
+          <button className={styles.tab} onClick={() => navigate("/register")}>
             Register
           </button>
         </div>
@@ -39,10 +70,26 @@ function LoginPage() {
         {/* Form Login */}
         <form className={styles.form} onSubmit={handleSubmit}>
           <label>Username</label>
-          <input type="text" placeholder="Enter Username" required />
+          <input
+            type="text"
+            name="username"
+            placeholder="Enter Username"
+            value={formData.username}
+            onChange={handleChange}
+            required
+          />
 
           <label>Password</label>
-          <input type="password" placeholder="Enter Password" required />
+          <input
+            type="password"
+            name="password"
+            placeholder="Enter Password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+
+          {error && <p style={{ color: "red" }}>{error}</p>}
 
           <button type="submit" className={styles.submitBtn}>
             Login

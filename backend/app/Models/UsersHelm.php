@@ -17,11 +17,6 @@ class UsersHelm extends Authenticatable
     protected $fillable = [
         'username',
         'password_hash',
-        'nama_lengkap',
-        'no_hp',
-        'id_helm',
-        'emergency_name',
-        'emergency_phone',
     ];
 
     protected $hidden = [
@@ -34,5 +29,22 @@ class UsersHelm extends Authenticatable
     public function getAuthPassword()
     {
         return $this->password_hash;
+    }
+
+    /**
+     * Relasi ke tabel helm_devices.
+     * Satu user bisa memiliki banyak helm.
+     */
+    public function helmDevices()
+    {
+        return $this->hasMany(HelmDevice::class, 'user_id', 'user_id');
+    }
+
+    /**
+     * Relasi opsional untuk helm yang sedang connected.
+     */
+    public function connectedHelms()
+    {
+        return $this->helmDevices()->where('pairing_status', 'connected');
     }
 }
