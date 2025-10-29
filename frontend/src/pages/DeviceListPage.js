@@ -71,7 +71,7 @@ useEffect(() => {
 
   // 🔹 Edit helm (ke halaman helmet-info)
   const handleEdit = (id) => {
-    navigate("/helmet-info", { state: { deviceId: id } });
+    navigate("/edit-contact", { state: { deviceId: id } });
   };
 
   // 🔹 Logout
