@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "./HelmetInfoPage.module.css";
-
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 function HelmetInfoPage() {
   const [helmetId, setHelmetId] = useState("");
   const [emergencyContact, setEmergencyContact] = useState("");
@@ -17,7 +17,7 @@ function HelmetInfoPage() {
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/user/helm",
+        `${BACKEND_URL}/api/user/helm`,
         {
           serial_number: helmetId, 
           emergency_phone: formattedPhone, 
@@ -31,8 +31,6 @@ function HelmetInfoPage() {
       );
 
       console.log("Helm berhasil ditambahkan:", response.data);
-
-
       navigate("/devices", {
         state: {
           newDevice: {

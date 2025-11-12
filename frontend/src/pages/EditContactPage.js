@@ -2,14 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import styles from "./EditContactPage.module.css";
-
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 function EditContactPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const [emergencyContact, setEmergencyContact] = useState("");
   const [loading, setLoading] = useState(false);
-
-  // Ambil deviceId dari state saat navigate
   const deviceId = location.state?.deviceId || "";
 
   useEffect(() => {
@@ -29,10 +27,8 @@ function EditContactPage() {
         alert("Token tidak ditemukan. Silakan login kembali.");
         return;
       }
-
-      // Panggil endpoint updateEmergencyContact
       const response = await axios.put(
-        "http://localhost:8000/api/user/emergency",
+        `${BACKEND_URL}/api/user/emergency`,
         {
           serial_number: deviceId,
           emergency_phone: emergencyContact,
@@ -43,11 +39,9 @@ function EditContactPage() {
           },
         }
       );
-
       alert("Nomor kontak darurat berhasil diperbarui!");
       console.log("Response:", response.data);
-
-      navigate("/devices"); // kembali ke halaman daftar helm
+      navigate("/devices"); 
     } catch (error) {
       console.error("Gagal memperbarui kontak darurat:", error);
       if (error.response?.data?.message) {

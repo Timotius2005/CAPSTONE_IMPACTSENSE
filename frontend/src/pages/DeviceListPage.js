@@ -3,42 +3,42 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { FiEdit2, FiUser, FiLogOut } from "react-icons/fi";
 import styles from "./DeviceListPage.module.css";
 import axios from "axios";
-
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 function DeviceListPage() {
   const [devices, setDevices] = useState([]);
   const location = useLocation();
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
-useEffect(() => {
-  const fetchUser = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-
-      const response = await axios.get("http://localhost:8000/api/user", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      setUsername(response.data.user.username); // sesuaikan field-nya kalau bukan 'name'
-    } catch (error) {
-      console.error("Gagal mengambil data user:", error);
-    }
-  };
-
-  fetchUser();
-}, []);
-
+  const [loadingId, setLoadingId] = useState(null);
   useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        const response = await axios.get("http://localhost:8000/api/user", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        setUsername(response.data.user.username);
+      } catch (error) {
+        console.error("Gagal mengambil data user:", error);
+      }
+    };
+
+    fetchUser();
+  }, []);
   const fetchHelmets = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:8000/api/user/helm-devices", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        `${BACKEND_URL}/api/user/helm-devices`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       if (response.data?.data) {
         const formatted = response.data.data.map((helm) => ({
@@ -53,11 +53,10 @@ useEffect(() => {
     }
   };
 
-  fetchHelmets();
-}, []);
-
-
-  // 🔹 Tambah helm baru dari state (jika baru ditambahkan)
+  useEffect(() => {
+    
+    fetchHelmets();
+  }, []);
   useEffect(() => {
     if (location.state?.newDevice) {
       setDevices((prev) => {
@@ -68,23 +67,17 @@ useEffect(() => {
       navigate(location.pathname, { replace: true });
     }
   }, [location.state, navigate, location.pathname]);
-
-  // 🔹 Edit helm (ke halaman helmet-info)
   const handleEdit = (id) => {
     navigate("/edit-contact", { state: { deviceId: id } });
   };
-
-  // 🔹 Logout
   const handleLogout = async () => {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        "http://localhost:8000/api/logout",
+        `${BACKEND_URL}/api/logout`,
         {},
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
@@ -96,6 +89,57 @@ useEffect(() => {
       alert("Gagal logout. Silakan coba lagi.");
     }
   };
+const handlePairing = async (deviceId) => {
+  setLoadingId(deviceId);
+
+  const STM_IP = process.env.REACT_APP_STM_IP;
+
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Token tidak ditemukan. Silakan login ulang.");
+      return;
+    }
+    const stmUrl = `${STM_IP}/pair?device=${encodeURIComponent(deviceId)}`;
+    console.log("🔗 Mengirim pairing ke STM:", stmUrl);
+    const stmResponse = await axios.get(stmUrl, { timeout: 25000 });
+    if (stmResponse.status === 200) {
+      console.log("✅ Respon STM:", stmResponse.data);
+      const backendUrl = `${BACKEND_URL}/api/pairing/${deviceId}`;
+      const backendRes = await axios.get(backendUrl, {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true
+      });
+
+      if (backendRes.status === 200) {
+        alert(
+          `Pairing berhasil untuk helm ${deviceId}\nNomor darurat: ${backendRes.data.emergency_phone}`
+        );
+      } else {
+        alert("Pairing ke server pusat gagal. Coba lagi.");
+      }
+    } else {
+      alert("STM tidak merespons pairing. Cek koneksi WiFi dan IP-nya.");
+    }
+  } catch (error) {
+    console.error("❌ Error pairing:", error);
+
+    if (error.code === "ECONNABORTED") {
+      alert("Koneksi ke STM timeout. Pastikan STM dan laptop di jaringan yang sama.");
+    } else if (error.response) {
+      alert(
+        `STM error: ${error.response.status} - ${error.response.statusText}`
+      );
+    } else {
+      alert(
+        "Tidak bisa terhubung ke STM. Pastikan IP benar dan server berjalan."
+      );
+    }
+  } finally {
+    setLoadingId(null);
+    await fetchHelmets(); 
+  }
+};
 
   return (
     <div
@@ -139,15 +183,27 @@ useEffect(() => {
                   />
                 </span>
                 <span className={styles.contact}>{device.contact}</span>
-                <button
+                  <button
                   className={
-                    device.status === "Connected"
+                    device.status === "connected"
                       ? styles.connectedBtn
                       : styles.disconnectedBtn
                   }
+                  onClick={() => {
+                    if (device.status === "disconnected" && !loadingId) {
+                      handlePairing(device.id);
+                    }
+                  }}
+                  disabled={loadingId === device.id}
                 >
-                  {device.status || "Disconnected"}
+                  {loadingId === device.id
+                    ? "⏳ Pairing..."
+                    : device.status === "connected"
+                    ? "✅ Paired"
+                    : "🔄 Pair"}
                 </button>
+
+
               </div>
             ))}
           </div>

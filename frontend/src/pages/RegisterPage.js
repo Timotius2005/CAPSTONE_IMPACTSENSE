@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "./RegisterPage.module.css";
-
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 function RegisterPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -18,16 +18,13 @@ function RegisterPage() {
       [e.target.name]: e.target.value,
     });
   };
-
- 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/register",
+        `${BACKEND_URL}/api/register`,
         formData,
         {
           headers: {

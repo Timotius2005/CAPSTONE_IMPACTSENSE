@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "./LoginPage.module.css";
-
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 function LoginPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -10,32 +10,27 @@ function LoginPage() {
     password: "",
   });
   const [error, setError] = useState("");
-
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
     try {
       const res = await axios.post(
-        "http://127.0.0.1:8000/api/login",
+        `${BACKEND_URL}/api/login`,
         {
           username: formData.username,
           password: formData.password,
         },
         { withCredentials: true }
       );
-
       if (res.data.token) {
         localStorage.setItem("token", res.data.token);
       }
-
       alert("Login successful!");
       navigate("/devices");
     } catch (err) {
